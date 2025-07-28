@@ -2,7 +2,7 @@
 import torch
 from logging import getLogger
 
-from TSPEnv import TSPEnv as Env
+from TSPEnv_max import TSPEnv_max as Env
 from TSPModel_max import TSPModel_max as Model
 
 from torch.optim import Adam as Optimizer
@@ -167,11 +167,11 @@ class TSPTrainer_max:
 
         # POMO Rollout
         ###############################################
-        state, reward, done = self.env.pre_step()
+        state, reward, done, _ = self.env.pre_step()
         while not done: #生成一个解：完整轨迹
             selected, prob = self.model(state)  #一次迭代：选一个点，给出选这个点的概率; a, π（a|s）= Actor(s)
             # shape: (batch, pomo)
-            state, reward, done = self.env.step(selected)  #跟环境交互，得到s', r = Critic(s, a)，更新环境
+            state, reward, done, _ = self.env.step(selected)  #跟环境交互，得到s', r = Critic(s, a)，更新环境
             prob_list = torch.cat((prob_list, prob[:, :, None]), dim=2) #收集每个a的π（a|s）
             #将 prob_list 和扩展维度后的 prob 沿着第三个维度（dim=2）进行拼接。
             #假设 prob_list 的形状为 (batch_size, pomo_size, t)，那么拼接后的 prob_list 的形状将变为 (batch_size, pomo_size, t + 1)。

@@ -2,7 +2,7 @@
 import torch
 from logging import getLogger
 
-from TSPEnv import TSPEnv as Env
+from TSPEnv_avg import TSPEnv_avg as Env
 from TSPModel_avg import TSPModel_avg as Model
 
 from torch.optim import Adam as Optimizer
@@ -59,7 +59,7 @@ class TSPTrainer_avg:
             self.result_log.set_raw_data(checkpoint['result_log'])
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.scheduler.last_epoch = model_load['epoch']-1
-            self.logger.info('Saved Model Loaded !!')
+            self.logger.info('Saved Model Loaded !! {}' . format(checkpoint_fullname))
 
         # utility
         self.time_estimator = TimeEstimator()
@@ -167,11 +167,11 @@ class TSPTrainer_avg:
 
         # POMO Rollout
         ###############################################
-        state, reward, done = self.env.pre_step()
+        state, reward, done, _ = self.env.pre_step()
         while not done: #生成一个解：完整轨迹
             selected, prob = self.model(state)  #一次迭代：选一个点，给出选这个点的概率; a, π（a|s）= Actor(s)
             # shape: (batch, pomo)
-            state, reward, done = self.env.step(selected)  #跟环境交互，得到s', r = Critic(s, a)，更新环境
+            state, reward, done, _ = self.env.step(selected)  #跟环境交互，得到s', r = Critic(s, a)，更新环境
             prob_list = torch.cat((prob_list, prob[:, :, None]), dim=2) #收集每个a的π（a|s）
             #将 prob_list 和扩展维度后的 prob 沿着第三个维度（dim=2）进行拼接。
             #假设 prob_list 的形状为 (batch_size, pomo_size, t)，那么拼接后的 prob_list 的形状将变为 (batch_size, pomo_size, t + 1)。

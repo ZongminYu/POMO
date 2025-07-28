@@ -2,7 +2,7 @@
 # Machine Environment Config
 
 DEBUG_MODE = False
-USE_CUDA = DEBUG_MODE
+USE_CUDA = True
 CUDA_DEVICE_NUM = 0
 
 
@@ -59,7 +59,7 @@ optimizer_params = {
 trainer_params = {
     'use_cuda': USE_CUDA,
     'cuda_device_num': CUDA_DEVICE_NUM,
-    'epochs': 510,
+    'epochs': 1000,
     'train_episodes': 100 * 1000,
     'train_batch_size': 64,
     'logging': {
@@ -75,9 +75,9 @@ trainer_params = {
         },
     },
     'model_load': {
-        'enable': False,  # enable loading pre-trained model
-        # 'path': './result/saved_tsp20_model',  # directory path of pre-trained model and log files saved.
-        # 'epoch': 510,  # epoch version of pre-trained model to laod.
+        'enable': True,  # enable loading pre-trained model
+        'path': './model',  # directory path of pre-trained model and log files saved.
+        'epoch': 510,  # epoch version of pre-trained model to laod.
 
     }
 }
